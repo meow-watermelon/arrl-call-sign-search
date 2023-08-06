@@ -21,7 +21,7 @@ if __name__ == "__main__":
         description="Ham Radio Call Sign Search Utility - ARRL"
     )
     parser.add_argument(
-        "--callsign", type=str, required=True, help="ham radio call sign string"
+        "callsign", type=str, help="ham radio call sign string"
     )
     args = parser.parse_args()
 

@@ -58,14 +58,13 @@ if __name__ == "__main__":
         sys.exit(4)
 
     # generate output
-    output["title"] = title.strip()
+    output["title"] = re.sub(r"\t+", "", title.strip())
     output["basic_info"] = []
     output["tables"] = []
 
     for item in call_sign_details_response:
         if not re.match(r"^\s+$", item):
             line = re.sub(r"\t+", "", item).strip()
-
             if re.match(r".*:\s+.*", line):
                 key, value = line.split(":")
                 output["tables"].append([key, value.strip()])

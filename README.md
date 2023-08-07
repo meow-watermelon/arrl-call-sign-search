@@ -13,17 +13,21 @@ Following Python packages are needed:
 ```
 lxml.html
 requests
+tabulate
 ```
 
 ## Usage
 
 ```
 $ ./arrl-call-sign-search.py -h
-usage: arrl-call-sign-search.py [-h] --callsign CALLSIGN
+usage: arrl-call-sign-search.py [-h] [--pretty] callsign
 
 Ham Radio Call Sign Search Utility - ARRL
 
+positional arguments:
+  callsign    ham radio call sign string
+
 options:
-  -h, --help           show this help message and exit
-  --callsign CALLSIGN  ham radio call sign string
+  -h, --help  show this help message and exit
+  --pretty    print pretty format
 ```

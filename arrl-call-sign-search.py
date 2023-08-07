@@ -5,6 +5,7 @@ import lxml.html
 import re
 import requests
 import sys
+import tabulate
 
 
 def build_query_payload(callsign: str) -> dict:
@@ -21,12 +22,16 @@ if __name__ == "__main__":
         description="Ham Radio Call Sign Search Utility - ARRL"
     )
     parser.add_argument(
-        "--callsign", type=str, required=True, help="ham radio call sign string"
+        "--pretty", required=False, action="store_true", help="print pretty format"
+    )
+    parser.add_argument(
+        "callsign", type=str, help="ham radio call sign string"
     )
     args = parser.parse_args()
 
     # set up constants
     arrl_call_sign_search_url = "https://www.arrl.org/advanced-call-sign-search"
+    output = {}
 
     # build query payload
     payload = build_query_payload(args.callsign)
@@ -55,8 +60,27 @@ if __name__ == "__main__":
         sys.exit(4)
 
     # generate output
-    print(title.strip())
+    output["title"] = title.strip()
+    output["basic_info"] = []
+    output["tables"] = []
+
     for item in call_sign_details_response:
         if not re.match(r"^\s+$", item):
             line = re.sub(r"\t+", "", item).strip()
-            print(line)
+
+            if re.match(r".*:\s+.*", line):
+                key, value = line.split(":")
+                output["tables"].append([key, value.strip()])
+            else:
+                output["basic_info"].append(line)
+
+    print(output["title"])
+    for item in output["basic_info"]:
+        print(item)
+
+    if args.pretty:
+        table_format = "simple_grid"
+        print(tabulate.tabulate(output["tables"], tablefmt=table_format))
+    else:
+        for item in output["tables"]:
+            print(f"{item[0]}: {item[1]}")

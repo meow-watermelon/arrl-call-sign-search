@@ -53,6 +53,12 @@ if __name__ == "__main__":
         call_sign_details_response = response_xml.xpath(
             "//div[@class='list2']/ul/li/p/text()"
         )
+
+        # some results do not have <p> tag
+        if not call_sign_details_response:
+            call_sign_details_response = response_xml.xpath(
+                "//div[@class='list2']/ul/li/text()"
+            )
     except Exception:
         print(f"ERROR: Could not get proper response from ARRL URL", file=sys.stderr)
         sys.exit(4)

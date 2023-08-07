@@ -24,9 +24,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pretty", required=False, action="store_true", help="print pretty format"
     )
-    parser.add_argument(
-        "callsign", type=str, help="ham radio call sign string"
-    )
+    parser.add_argument("callsign", type=str, help="ham radio call sign string")
     args = parser.parse_args()
 
     # set up constants

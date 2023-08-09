@@ -67,23 +67,42 @@ if __name__ == "__main__":
     output["title"] = re.sub(r"\t+", "", title.strip())
     output["basic_info"] = []
     output["tables"] = []
+    license_holders = []
+    current_license_holder = []
+    primary_holder_processed = False
+    for line in call_sign_details_response:
+        line = line.strip()  # Remove leading and trailing whitespace
+        if line.startswith("Previous call sign:"):
+            # If we encounter a "Previous call sign" line, we know that a new license holder is starting
+            if current_license_holder:
+                license_holders.append(current_license_holder)
+                current_license_holder = []
+        current_license_holder.append(line)
+    # Add the last license holder if there is one
+    if current_license_holder:
+        license_holders.append(current_license_holder)
 
-    for item in call_sign_details_response:
-        if not re.match(r"^\s+$", item):
-            line = re.sub(r"\t+", "", item).strip()
-            if re.match(r".*:\s+.*", line):
-                key, value = line.split(":")
-                output["tables"].append([key, value.strip()])
-            else:
-                output["basic_info"].append(line)
+    for license_holder in license_holders: 
+        if primary_holder_processed: print()
+        output["tables"] = []
+        for item in license_holder:
+            if not re.match(r"^\s+$", item):
+                line = re.sub(r"\t+", "", item).strip()
+                if re.match(r".*:\s+.*", line):
+                    key, value = line.split(":")
+                    output["tables"].append([key, value.strip()])
+                else:
+                    if not primary_holder_processed: 
+                        output["basic_info"].append(line)
+        if not primary_holder_processed:
+            print(output["title"])
+            for item in output["basic_info"]:
+                print(item.replace("Previous call sign","\033[1mPrevious call sign\033[0m"))
+            primary_holder_processed = True
 
-    print(output["title"])
-    for item in output["basic_info"]:
-        print(item)
-
-    if args.pretty:
-        table_format = "simple_grid"
-        print(tabulate.tabulate(output["tables"], tablefmt=table_format))
-    else:
-        for item in output["tables"]:
-            print(f"{item[0]}: {item[1]}")
+        if args.pretty:
+            table_format = "simple_grid"
+            print(tabulate.tabulate(output["tables"], tablefmt=table_format))
+        else:
+            for item in output["tables"]:
+                print(f"{item[0]}: {item[1]}")
